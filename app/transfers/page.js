@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Header from '../components/header';
 import Footer from '../components/footer';
 import PageWrapper from '../components/pagewrapper';
+import { getCloudinaryUrl } from '../../utils/imageUtils'; // ✅ ADDED: Import utility
 
 async function fetchTransfers(page = 1, blogsPerPage = 6) {
   const start = (page - 1) * blogsPerPage;
@@ -125,7 +126,6 @@ export default function TransfersPage() {
             </select>
           </div>
 
-
           {/* Blog Cards Grid - Mobile: list style, Desktop: grid */}
           <div className="block sm:grid sm:grid-cols-2 md:grid-cols-3 sm:gap-6 mb-8">
             {filteredBlogs.length === 0 ? (
@@ -134,10 +134,11 @@ export default function TransfersPage() {
               </div>
             ) : (
               filteredBlogs.map(blog => {
-                const imageUrl = blog.image?.url
-                  ? `${process.env.NEXT_PUBLIC_STRAPI_IMAGE_BASE_URL}${blog.image.url}`
-                  : '/placeholder.jpg';
-
+                // ✅ UPDATED: Use the utility function to get proper Cloudinary URL
+                const imageUrl = getCloudinaryUrl(blog.image);
+                
+                // ✅ ADDED: Debug logging (remove after testing)
+                console.log('Transfer blog:', blog.title, 'Image URL:', imageUrl);
 
                 return (
                   <Link key={blog.id} href={`/transfers/${blog.slug}`}>
@@ -146,11 +147,18 @@ export default function TransfersPage() {
 
                       {/* Mobile: Small thumbnail on left, Desktop: Full width image on top */}
                       <div className="flex-shrink-0 w-20 h-20 sm:w-full sm:h-52">
-                        <img
-                          src={imageUrl}
-                          alt={blog.title}
-                          className="w-full h-full object-cover rounded-lg sm:rounded-none sm:object-contain"
-                        />
+                        {/* ✅ UPDATED: Added conditional rendering for missing images */}
+                        {imageUrl ? (
+                          <img
+                            src={imageUrl}
+                            alt={blog.title}
+                            className="w-full h-full object-cover rounded-lg sm:rounded-none sm:object-contain"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-500 text-xs">
+                            No Image
+                          </div>
+                        )}
                       </div>
 
                       {/* Mobile: Content on right, Desktop: Content below image */}
@@ -206,7 +214,6 @@ export default function TransfersPage() {
                 Next &gt;
               </button>
             </div>
-
           )}
         </div>
       </main>

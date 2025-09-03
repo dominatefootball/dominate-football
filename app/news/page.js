@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Header from '../components/header';
 import Footer from '../components/footer';
 import PageWrapper from '../components/pagewrapper';
+import { getCloudinaryUrl } from '../../utils/imageUtils';
 
 async function fetchNews(page = 1, blogsPerPage = 6) {
   const start = (page - 1) * blogsPerPage;
@@ -19,13 +20,13 @@ async function fetchNews(page = 1, blogsPerPage = 6) {
   }
 );
 
-
   const data = await res.json();
   return {
     blogs: data.data,
     totalBlogs: data.meta.pagination.total
   };
 }
+
 export default function NewsPage() {
   const [blogs, setBlogs] = useState([]);
   const [filteredBlogs, setFilteredBlogs] = useState([]);
@@ -135,10 +136,11 @@ export default function NewsPage() {
               </div>
             ) : (
               filteredBlogs.map(blog => {
-                const imageUrl = blog.image?.url
-                  ? `${process.env.NEXT_PUBLIC_STRAPI_IMAGE_BASE_URL}${blog.image.url}`
-                  : '/placeholder.jpg';
-
+                // ✅ UPDATED: Use the utility function to get proper Cloudinary URL
+                const imageUrl = getCloudinaryUrl(blog.image);
+                
+                // ✅ ADDED: Debug logging (remove after testing)
+                console.log('Blog:', blog.title, 'Image URL:', imageUrl);
 
                 return (
                   <Link key={blog.id} href={`/news/${blog.slug}`}>
@@ -147,11 +149,18 @@ export default function NewsPage() {
 
                       {/* Mobile: Small thumbnail on left, Desktop: Full width image on top */}
                       <div className="flex-shrink-0 w-20 h-20 sm:w-full sm:h-52">
-                        <img
-                          src={imageUrl}
-                          alt={blog.title}
-                          className="w-full h-full object-cover rounded-lg sm:rounded-none sm:object-contain"
-                        />
+                        {/* ✅ UPDATED: Added conditional rendering for missing images */}
+                        {imageUrl ? (
+                          <img
+                            src={imageUrl}
+                            alt={blog.title}
+                            className="w-full h-full object-cover rounded-lg sm:rounded-none sm:object-contain"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-500 text-xs">
+                            No Image
+                          </div>
+                        )}
                       </div>
 
                       {/* Mobile: Content on right, Desktop: Content below image */}
@@ -207,7 +216,6 @@ export default function NewsPage() {
                 Next &gt;
               </button>
             </div>
-
           )}
         </div>
       </main>
