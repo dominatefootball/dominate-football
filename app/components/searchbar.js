@@ -1,8 +1,8 @@
-// components/searchbar.js
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { getCloudinaryUrl } from '../../utils/imageUtils'; // ✅ ADDED: Import utility
 
 export default function SearchBar() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,7 +42,6 @@ export default function SearchBar() {
           cache: 'no-store'
         }
       );
-
 
       if (res.ok) {
         const data = await res.json();
@@ -89,13 +88,11 @@ export default function SearchBar() {
         />
 
         {/* Search Icon */}
-        {/* Search Icon - make smaller on mobile */}
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:pr-3 pointer-events-none">
           <svg className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
-
 
         {/* Loading Spinner */}
         {isLoading && (
@@ -109,10 +106,8 @@ export default function SearchBar() {
       {isOpen && searchResults.length > 0 && (
         <div className="absolute top-full right-0 mt-1 bg-white rounded-md shadow-xl border border-gray-200 z-50 max-h-60 sm:max-h-80 overflow-y-auto w-64 sm:w-80">
           {searchResults.map((blog) => {
-            const imageUrl = blog.image?.url
-              ? `${process.env.NEXT_PUBLIC_STRAPI_IMAGE_BASE_URL}${blog.image.url}`
-              : null;
-
+            // ✅ UPDATED: Use utility function for search result images
+            const imageUrl = getCloudinaryUrl(blog.image);
 
             return (
               <Link
