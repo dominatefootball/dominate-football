@@ -3,6 +3,8 @@ import Header from '../../components/header';
 import Footer from '../../components/footer';
 import PageWrapper from '../../components/pagewrapper';
 import PollWrapper from '../../components/pollwrapper'; // ✅ uses Strapi-backed votes
+import { getCloudinaryUrl } from '../../../utils/imageUtils'; // ✅ ADDED: Import utility
+
 
 async function fetchBlogBySlug(slug) {
   const url = `${process.env.STRAPI_API_URL}/blogs?filters[slug][$eq]=${slug}&populate[body][populate]=*&populate[image]=true`;
@@ -24,7 +26,6 @@ async function fetchBlogBySlug(slug) {
   return data.data[0];
 }
 
-
 export default async function TransferBlogDetail({ params }) {
   const { slug } = await params;          // ✅ Must await params
   const blog = await fetchBlogBySlug(slug);
@@ -40,8 +41,8 @@ export default async function TransferBlogDetail({ params }) {
   }
 
   const { title, author, publishedDate, content, image } = blog;
-  const imageUrl = image?.url ? `${process.env.NEXT_PUBLIC_STRAPI_IMAGE_BASE_URL}${image.url}` : null;
-
+  // ✅ UPDATED: Use utility function instead of manual URL construction
+  const imageUrl = getCloudinaryUrl(image);
 
   return (
     <PageWrapper>
@@ -87,8 +88,6 @@ export default async function TransferBlogDetail({ params }) {
                 <PollWrapper slug={slug} />
               </div>
             </div>
-
-
 
             {/* Blog content container */}
             <div className="bg-white bg-opacity-95 shadow-lg rounded-lg p-6">
@@ -171,10 +170,8 @@ export default async function TransferBlogDetail({ params }) {
                     /* ───────────── image block ───────────── */
                     case 'components.image-block': {
                       const imageData = Array.isArray(block.image) ? block.image[0] : block.image;
-                      const blockImageUrl = imageData?.url
-                        ? `${process.env.NEXT_PUBLIC_STRAPI_IMAGE_BASE_URL}${imageData.url}`
-                        : null;
-
+                      // ✅ UPDATED: Use utility function for inline images too
+                      const blockImageUrl = getCloudinaryUrl(imageData);
 
                       return blockImageUrl ? (
                         <figure key={`dynamic-${idx}`} className="my-6">

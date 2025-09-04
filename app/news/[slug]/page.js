@@ -2,6 +2,8 @@ import React from 'react';
 import Header from '../../components/header';
 import Footer from '../../components/footer';
 import PageWrapper from '../../components/pagewrapper';
+import { getCloudinaryUrl } from '../../../utils/imageUtils'; // ✅ ADDED: Import utility
+
 
 async function fetchBlogBySlug(slug) {
   const url = `${process.env.STRAPI_API_URL}/blogs?filters[slug][$eq]=${slug}&populate[body][populate]=*&populate[image]=true`;
@@ -22,8 +24,9 @@ async function fetchBlogBySlug(slug) {
   return data.data[0];
 }
 
+
 export default async function NewsBlogDetail({ params }) {
-  const { slug } = await params;          // ✅ Must await params
+  const { slug } = await params;
   const blog = await fetchBlogBySlug(slug);
 
   if (!blog) {
@@ -37,15 +40,15 @@ export default async function NewsBlogDetail({ params }) {
   }
 
   const { title, author, publishedDate, content, image } = blog;
-  const imageUrl = image?.url ? `${process.env.NEXT_PUBLIC_STRAPI_IMAGE_BASE_URL}${image.url}` : null;
-
+  
+  // ✅ UPDATED: Use utility function instead of manual URL construction
+  const imageUrl = getCloudinaryUrl(image);
 
   return (
     <PageWrapper>
       <Header />
       <main className="p-6 md:p-10 min-h-screen">
         <div className="max-w-5xl mx-auto">
-          {/* Single column layout for news - no poll sidebar */}
           <div className="w-full space-y-6">
             {imageUrl && (
               <>
@@ -65,7 +68,6 @@ export default async function NewsBlogDetail({ params }) {
               </>
             )}
 
-            {/* Blog content container */}
             <div className="bg-white bg-opacity-95 shadow-lg rounded-lg p-6">
               <h1 className="text-3xl font-bold mb-4 text-gray-800">{title}</h1>
               <p className="text-sm text-gray-600 mb-6">
@@ -145,10 +147,8 @@ export default async function NewsBlogDetail({ params }) {
                     /* ───────────── image block ───────────── */
                     case 'components.image-block': {
                       const imageData = Array.isArray(block.image) ? block.image[0] : block.image;
-                      const blockImageUrl = imageData?.url
-                        ? `${process.env.NEXT_PUBLIC_STRAPI_IMAGE_BASE_URL}${imageData.url}`
-                        : null;
-
+                      // ✅ UPDATED: Use utility function for inline images too
+                      const blockImageUrl = getCloudinaryUrl(imageData);
 
                       return blockImageUrl ? (
                         <figure key={`dynamic-${idx}`} className="my-6">
