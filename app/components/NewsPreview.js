@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { getCloudinaryUrl } from '../../utils/imageUtils'; // ADDED: Import utility function
 
 export default function NewsPreview({ newsBlogs }) {
   if (!newsBlogs || newsBlogs.length === 0) {
@@ -24,21 +25,25 @@ export default function NewsPreview({ newsBlogs }) {
           {/* 2-Grid Layout - Just the blog cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             {latestNews.map((blog) => {
-              const imageUrl = blog.image?.url
-                ? `${process.env.NEXT_PUBLIC_STRAPI_IMAGE_BASE_URL}${blog.image.url}`
-                : '/placeholder.jpg';
-
+              // UPDATED: Use utility function to get correct Cloudinary image URL
+              const imageUrl = getCloudinaryUrl(blog.image) || '/placeholder.jpg';
 
               return (
                 <Link key={blog.id} href={`/news/${blog.slug}`}>
                   <div className="bg-white bg-opacity-95 rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105 cursor-pointer h-full">
                     {/* Image */}
                     <div className="relative w-full h-24 sm:h-32">
-                      <img
-                        src={imageUrl}
-                        alt={blog.title}
-                        className="absolute inset-0 w-full h-full object-cover"
-                      />
+                      {imageUrl !== '/placeholder.jpg' ? (
+                        <img
+                          src={imageUrl}
+                          alt={blog.title}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 w-full h-full bg-gray-300 flex items-center justify-center text-gray-500 text-xs">
+                          No Image
+                        </div>
+                      )}
                     </div>
 
                     {/* Content */}

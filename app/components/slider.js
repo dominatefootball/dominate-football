@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
 import Link from 'next/link';
+import { getCloudinaryUrl } from '../../utils/imageUtils';
+
 
 export default function BlogSlider({ blogs }) {
   const sliderInstanceRef = useRef(null);
@@ -101,10 +103,8 @@ export default function BlogSlider({ blogs }) {
         {extendedSlides.map((blog, index) => {
           const { id, title, author, publishedDate, slug, image, slidertitleColour } = blog;
 
-          const imageUrl = image?.url
-            ? `${process.env.NEXT_PUBLIC_STRAPI_IMAGE_BASE_URL}${image.url}`
-            : '/placeholder.jpg';
-
+          // ✅ UPDATED: Use the utility function to get correct Cloudinary image URL
+          const imageUrl = getCloudinaryUrl(image) || '/placeholder.jpg';
 
           return (
             <div key={`${id}-${index}`} className="keen-slider__slide flex justify-center">
@@ -128,11 +128,18 @@ export default function BlogSlider({ blogs }) {
                 <Link href={`/${blog.category}/${blog.slug}`} className="block">
                   <div className="bg-white bg-opacity-90 rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-105">
                     <div className="relative w-full h-[180px] sm:h-[300px] md:h-[350px]">
-                      <img
-                        src={imageUrl}
-                        alt={title}
-                        className="absolute inset-0 w-full h-full object-contain scale-125 sm:scale-100"
-                      />
+                      {/* ✅ UPDATED: Added conditional rendering for missing images */}
+                      {imageUrl !== '/placeholder.jpg' ? (
+                        <img
+                          src={imageUrl}
+                          alt={title}
+                          className="absolute inset-0 w-full h-full object-contain scale-125 sm:scale-100"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 w-full h-full bg-gray-300 flex items-center justify-center text-gray-500">
+                          No Image
+                        </div>
+                      )}
                     </div>
                     <div className="p-2 sm:p-4">
                       <h2 className={`text-lg sm:text-xl md:text-2xl font-extrabold ${getColorClass(slidertitleColour)} tracking-tight mb-2 drop-shadow-md`}>
@@ -152,6 +159,7 @@ export default function BlogSlider({ blogs }) {
             </div>
           );
         })}
+
       </div>
     </div>
   );
