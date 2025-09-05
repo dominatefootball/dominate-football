@@ -27,10 +27,10 @@ export default function ContactUsPage() {
           {/* Regular mailto link */}
           <div className="mb-4">
             <a 
-              href="mailto:dominatefootball@hotmail.com"
+              href="mailto:dominatefootball5@gmail.com"
               className="text-arsenalRed font-semibold hover:text-red-700 transition-colors text-2xl"
             >
-              dominatefootball@hotmail.com
+              dominatefootball5@gmail.com
             </a>
           </div>
           

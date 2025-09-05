@@ -64,8 +64,8 @@ export default function AccessibilityPage() {
       </p>
       <p className="mb-4">
         You can reach us at{' '}
-        <a href="mailto:dominatefootball@hotmail.com" className="underline text-arsenalRed hover:text-red-700">
-          dominatefootball@hotmail.com
+        <a href="mailto:dominatefootball5@gmail.com" className="underline text-arsenalRed hover:text-red-700">
+          dominatefootball5@gmail.com
         </a>. We aim to respond to accessibility inquiries within 2-3 business days.
       </p>
 

@@ -9,7 +9,7 @@ export default function TermsPage() {
 
       <p className="mb-4">
         These Terms of Service ("Terms") govern your use of the <strong>Dominate Football</strong> website located at
-        <strong> https://dominatefootball.com</strong>. By accessing or using the site, you agree to be bound by these Terms.
+        <strong> https://dominate-football.vercel.app</strong>. By accessing or using the site, you agree to be bound by these Terms.
       </p>
 
       <h2 className="text-xl font-semibold mt-8 mb-2">1. Use of the Site</h2>
@@ -69,8 +69,8 @@ export default function TermsPage() {
       <h2 className="text-xl font-semibold mt-8 mb-2">10. Contact</h2>
       <p className="mb-4">
         If you have any questions about these Terms, please contact us at{' '}
-        <a href="mailto:dominatefootball@hotmail.com" className="underline text-arsenalRed hover:text-red-700">
-          dominatefootball@hotmail.com
+        <a href="mailto:dominatefootball5@gmail.com" className="underline text-arsenalRed hover:text-red-700">
+          dominatefootball5@gmail.com
         </a>.
       </p>
     </main>

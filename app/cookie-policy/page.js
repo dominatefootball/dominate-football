@@ -8,7 +8,7 @@ export default function CookiePolicyPage() {
       <h1 className="text-3xl font-bold mb-6">Cookie Policy</h1>
 
       <p className="mb-4">
-        This Cookie Policy explains how <strong>Dominate Football</strong> uses cookies and similar technologies to recognize you when you visit our website at <strong>https://dominatefootball.com</strong>.
+        This Cookie Policy explains how <strong>Dominate Football</strong> uses cookies and similar technologies to recognize you when you visit our website at <strong>https://dominate-football.vercel.app</strong>.
         It explains what these technologies are, why we use them, and your rights to control their use.
       </p>
 
@@ -65,8 +65,8 @@ export default function CookiePolicyPage() {
       <h2 className="text-xl font-semibold mt-8 mb-2">7. Contact Us</h2>
       <p className="mb-4">
         If you have any questions about our use of cookies, please contact us at{' '}
-        <a href="mailto:dominatefootball@hotmail.com" className="underline text-arsenalRed hover:text-red-700">
-          dominatefootball@hotmail.com
+        <a href="mailto:dominatefootball5@gmail.com" className="underline text-arsenalRed hover:text-red-700">
+          dominatefootball5@gmail.com
         </a>.
       </p>
     </main>

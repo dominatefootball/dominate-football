@@ -8,7 +8,7 @@ export default function PrivacyPolicyPage() {
       <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
 
       <p className="mb-4">
-        At <strong>Dominate Football</strong>, accessible from https://dominatefootball.com, your privacy is one of our top priorities.
+        At <strong>Dominate Football</strong>, accessible from https://dominate-football.vercel.app, your privacy is one of our top priorities.
         This Privacy Policy document outlines the types of information we collect and how we use it.
       </p>
 
@@ -50,8 +50,8 @@ export default function PrivacyPolicyPage() {
       <p className="mb-4">
         You have the right to access, update, or delete your personal data. 
         To exercise your rights, please contact us at{' '}
-        <a href="mailto:dominatefootball@hotmail.com" className="underline text-arsenalRed hover:text-red-700">
-          dominatefootball@hotmail.com
+        <a href="mailto:dominatefootball5@gmail.com" className="underline text-arsenalRed hover:text-red-700">
+          dominatefootball5@gmail.com
         </a>.
       </p>
 
@@ -76,8 +76,8 @@ export default function PrivacyPolicyPage() {
       <h2 className="text-xl font-semibold mt-8 mb-2">10. Contact Us</h2>
       <p className="mb-4">
         If you have questions or concerns about this policy, please email us at{' '}
-        <a href="mailto:dominatefootball@hotmail.com" className="underline text-arsenalRed hover:text-red-700">
-          dominatefootball@hotmail.com
+        <a href="mailto:dominatefootball5@gmail.com" className="underline text-arsenalRed hover:text-red-700">
+          dominatefootball5@gmail.com
         </a>.
       </p>
     </main>
