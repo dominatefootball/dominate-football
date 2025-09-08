@@ -33,9 +33,8 @@ body {
 
 /* Slower shine animation */
 .animate-shine {
-  animation: shine 1.5s ease-in-out infinite;  /* Changed from 2s to 1s */
+  animation: shine 1.5s ease-in-out infinite; /* Changed from 2s to 1.5s */
 }
-
 
 /* Responsive circle that adapts to button size */
 .flashlight-gradient {
@@ -55,22 +54,21 @@ body {
   top: -50%;
 }
 
-/* 
+/*
 @media (max-width: 640px) {
   h1 { font-size: 1.5rem !important; }
   h2 { font-size: 1.25rem !important; }
-  
+
   .keen-slider__slide {
     padding: 0.5rem;
   }
-  
-  
+
   button {
     min-height: 44px;
     min-width: 44px;
   }
-}*/
-   
+}
+*/
 
 @media (max-width: 639px) {
   .keen-slider button[aria-label*="Slide"] {
@@ -137,26 +135,34 @@ body {
   }
 }
 
-/* Fix mobile background tilt issue */
-@media screen and (max-width: 768px) {
+/* Fix background jitter on fast scroll mobile by using pseudo-element */
+@media screen and (min-width: 769px) {
   body {
-    background-attachment: scroll !important;
-  }
-  
-  /* Alternative: Hide background on mobile, use solid color */
-  .mobile-bg-fix {
-    background: #1a365d !important; /* Your site's dark blue */
+    background-image: url('/bg1.jpg');
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
+@media screen and (max-width: 768px) {
+  body {
+    background: none;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-image: url('/bg1.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -10;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+  }
+}
