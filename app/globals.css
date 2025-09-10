@@ -135,7 +135,7 @@ body {
   }
 }
 
-/* Fix background jitter on fast scroll mobile by using pseudo-element */
+/* Ultimate fix for mobile background jitter - hardware accelerated */
 @media screen and (min-width: 769px) {
   body {
     background-image: url('/bg1.jpg');
@@ -149,7 +149,9 @@ body {
 @media screen and (max-width: 768px) {
   body {
     background: none;
+    overflow-x: hidden;
   }
+  
   body::before {
     content: '';
     position: fixed;
@@ -161,8 +163,12 @@ body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    z-index: -10;
+    background-attachment: scroll;
+    z-index: -999;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
     will-change: transform;
-    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 }
