@@ -53,10 +53,7 @@ export default async function Home() {
   const newsBlogs = newsData.data;
 
   return (
-    <div
-      className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed"
-      style={{ backgroundImage: "url('/bg1.jpg')" }}
-    >
+    <div className="min-h-screen">
       <Header />
       <main className="p-4 sm:p-6 md:p-10 min-h-screen">
         {/* Existing Slider */}
