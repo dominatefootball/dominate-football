@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { ThumbsUp, ThumbsDown, Lightbulb, AlertCircle } from 'lucide-react';
 
 // NEW (remove /api/ since env already has it):
-const API_BASE = process.env.NEXT_PUBLIC_STRAPI_API_URL.replace('/api', '') + '/blogs';
+const API_BASE = 'https://dominate-football-backend.onrender.com/blogs';
 
 
 
