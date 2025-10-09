@@ -27,7 +27,7 @@ export default async function Home() {
 
   /* ───── configurable lists ───── */
   const excludedBlogIds = [79, 80];  // don't show these in slider
-  const featuredBlogId  = 46;       // must remain first
+  const featuredBlogId  = 47;       // must remain first
   /* ────────────────────────────── */
 
   // 1. apply exclusions (already sorted by date from API)
