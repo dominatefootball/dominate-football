@@ -7,7 +7,7 @@ import NewsPreview from '../components/NewsPreview'; // Import the new component
 
 async function fetchBlogs() {
   // Modified: Limit to 7 blogs, sorted by latest first
-  const res = await fetch(`${process.env.STRAPI_API_URL}/api/blogs?populate=*&sort=publishedDate:desc&pagination[limit]=7`, {
+  const res = await fetch(`${process.env.STRAPI_API_URL}/blogs?populate=*&sort=publishedDate:desc&pagination[limit]=7`, {
     headers: {
       'Authorization': `Bearer ${process.env.STRAPI_API_TOKEN}`
     },
@@ -22,39 +22,27 @@ async function fetchBlogs() {
   return json.data;
 }
 
-// Helper function to safely get slug (works with Strapi v4 and v5)
-function getSlug(blog) {
-  if (!blog) return '';
-  return blog.slug || blog.attributes?.slug || '';
-}
-
 export default async function Home() {
   const blogs = await fetchBlogs();
 
   /* ───── configurable lists ───── */
-  // ✅ NEW: Use slugs instead of IDs (update these with your actual blog slugs)
-  const excludedBlogSlugs = [];  // Add slugs to exclude, e.g., ['slug-1', 'slug-2']
-  const featuredBlogSlug = 'eze-joins-arsenal';  // ← CHANGE THIS to your featured blog's slug
+  const excludedBlogIds = [79, 80];  // don't show these in slider
+  const featuredBlogId  = 47;       // must remain first
   /* ────────────────────────────── */
 
-  // 1. apply exclusions using slugs (already sorted by date from API)
-  const filteredBlogs = blogs.filter(blog => {
-    const slug = getSlug(blog);
-    return !excludedBlogSlugs.includes(slug);
-  });
+  // 1. apply exclusions (already sorted by date from API)
+  const filteredBlogs = blogs
+    .filter(blog => !excludedBlogIds.includes(blog.id));
 
   // 2. pull featured blog out of its position and unshift to index 0
-  const idx = filteredBlogs.findIndex(b => getSlug(b) === featuredBlogSlug);
+  const idx = filteredBlogs.findIndex(b => b.id === featuredBlogId);
   if (idx > -1) {
     const [featured] = filteredBlogs.splice(idx, 1);
     filteredBlogs.unshift(featured);
-  } else {
-    // Optional: Log warning if featured blog not found
-    console.warn(`⚠️ Featured blog "${featuredBlogSlug}" not found`);
   }
 
   // 3. Filter news blogs for the preview section (separate fetch for news)
-  const newsRes = await fetch(`${process.env.STRAPI_API_URL}/api/blogs?populate=*&filters[category][$eq]=news&sort=publishedDate:desc`, {
+  const newsRes = await fetch(`${process.env.STRAPI_API_URL}/blogs?populate=*&filters[category][$eq]=news&sort=publishedDate:desc`, {
     headers: {
       'Authorization': `Bearer ${process.env.STRAPI_API_TOKEN}`
     },
