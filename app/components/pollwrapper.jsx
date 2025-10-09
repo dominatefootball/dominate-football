@@ -2,10 +2,8 @@
 import { useState, useEffect } from 'react';
 import { ThumbsUp, ThumbsDown, Lightbulb, AlertCircle } from 'lucide-react';
 
-// ✅ Use /api/blogs (standard Strapi v5)
+// ✅ Use your Strapi API for fetching poll data
 const API_BASE = 'https://dominate-football-backend.onrender.com/api/blogs';
-
-
 
 const options = [
   { label: 'Good', icon: <ThumbsUp className="text-green-500" />, id: 0, color: 'bg-green-400' },
@@ -14,43 +12,32 @@ const options = [
 ];
 
 export default function PollWrapper({ slug }) {
-  console.log('🚀 PollWrapper mounted with slug:', slug);
-
   const [votes, setVotes] = useState({ 0: 0, 1: 0, 2: 0 });
   const [hasVoted, setHasVoted] = useState(false);
   const [userVote, setUserVote] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [blogDocumentId, setBlogDocumentId] = useState(null); // Changed from blogId
 
-  // Fetch poll data using collection endpoint with slug filter
+  // Fetch poll data from Strapi
   const fetchPollData = async () => {
-    console.log('🔄 fetchPollData() -> GET collection with slug filter:', slug);
     setLoading(true);
     setError(null);
 
     try {
       const res = await fetch(`${API_BASE}?filters[slug][$eq]=${slug}&populate=*`);
-      console.log('← GET status:', res.status);
 
       if (!res.ok) throw new Error(`GET failed: ${res.status}`);
 
       const data = await res.json();
-      console.log('← GET response JSON:', data);
-
       const blog = data.data[0];
+      
       if (!blog) {
         throw new Error('Blog not found with slug: ' + slug);
       }
 
-      // Store the blog documentId for updates (Strapi v5)
-      setBlogDocumentId(blog.documentId);
-      console.log('↳ Found blog with documentId:', blog.documentId);
-
-      // Direct access to pollVotes (no attributes in Strapi v5)
+      // Get current poll votes
       const backendVotes = blog.pollVotes || { "0": 0, "1": 0, "2": 0 };
-      console.log('↳ backendVotes:', backendVotes);
 
       setVotes({
         0: parseInt(backendVotes["0"] || 0, 10),
@@ -82,70 +69,53 @@ export default function PollWrapper({ slug }) {
     }
   }, [slug]);
 
-  // Handle voting using standard UPDATE endpoint with documentId
+  // ✅ UPDATED: Handle voting using YOUR Next.js API route
   const handleVote = async (optionId) => {
-    if (hasVoted || submitting || !blogDocumentId) return;
-
-    console.log('🗳️ Frontend: Starting vote for option', optionId);
-    console.log('🗳️ Frontend: Using blogDocumentId', blogDocumentId);
+    if (hasVoted || submitting) return;
 
     setSubmitting(true);
     setError(null);
 
     try {
-      const newVotes = {
-        "0": votes[0] + (optionId === 0 ? 1 : 0),
-        "1": votes[1] + (optionId === 1 ? 1 : 0),
-        "2": votes[2] + (optionId === 2 ? 1 : 0),
-      };
-
-      console.log('🗳️ Frontend: New votes to send:', newVotes);
-
-      // Use standard UPDATE endpoint with documentId (Strapi v5)
-      const res = await fetch(`${API_BASE}/${blogDocumentId}`, {
-        method: 'PUT',
+      // ✅ Call your custom API route (server-side handles everything)
+      const res = await fetch('/api/vote', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          data: {
-            pollVotes: newVotes
-          }
+          slug: slug,
+          optionId: optionId
         }),
       });
 
-      console.log('🗳️ Frontend: Response status:', res.status);
-
       if (!res.ok) {
-        const errorText = await res.text();
-        console.error('🗳️ Frontend: Error response:', errorText);
-        throw new Error(`Vote failed: ${res.status} - ${errorText}`);
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Vote failed');
       }
 
-      const responseData = await res.json();
-      console.log('🗳️ Frontend: Success response:', responseData);
+      const data = await res.json();
 
-      // Update local state
+      // Update local state with new vote counts
       setVotes({
-        0: parseInt(newVotes["0"], 10),
-        1: parseInt(newVotes["1"], 10),
-        2: parseInt(newVotes["2"], 10),
+        0: parseInt(data.votes["0"], 10),
+        1: parseInt(data.votes["1"], 10),
+        2: parseInt(data.votes["2"], 10),
       });
 
+      // Mark as voted
       setHasVoted(true);
       setUserVote(optionId);
       localStorage.setItem(`pollVoted-${slug}`, 'true');
       localStorage.setItem(`pollVote-${slug}`, optionId.toString());
 
-      console.log('✅ Frontend: Vote saved successfully!');
+      console.log('✅ Vote successful! Blog ID:', data.blogId);
 
     } catch (err) {
-      console.error('❌ Frontend: Voting error:', err);
+      console.error('❌ Voting error:', err);
       setError(err.message);
     } finally {
       setSubmitting(false);
     }
   };
-
-
 
   const totalVotes = Object.values(votes).reduce((sum, v) => sum + v, 0);
 
@@ -207,14 +177,13 @@ export default function PollWrapper({ slug }) {
       <div className="space-y-4">
         {options.map(({ label, icon, id }) => {
           const percent = totalVotes > 0 ? Math.round((votes[id] / totalVotes) * 100) : 0;
-          const voteCount = votes[id] || 0;
           const isUserVote = userVote === id;
 
           return (
             <div key={id} className="relative">
               <button
                 onClick={() => handleVote(id)}
-                disabled={hasVoted || submitting || !blogDocumentId} // Updated condition
+                disabled={hasVoted || submitting}
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-lg border transition-all duration-200 ${hasVoted
                   ? isUserVote
                     ? 'bg-blue-50 border-blue-200 cursor-default'
@@ -235,9 +204,6 @@ export default function PollWrapper({ slug }) {
                   <span className="text-sm font-semibold text-gray-700">
                     {percent}%
                   </span>
-                  {/*<span className="text-xs text-gray-500">
-                    ({voteCount} votes)
-                  </span>*/}
                 </div>
               </button>
               {totalVotes > 0 && renderProgressBar(id)}
@@ -254,9 +220,8 @@ export default function PollWrapper({ slug }) {
       )}
 
       {hasVoted && !submitting && (
-        <p className="text-sm text-gray-600 text-center">Thanks for voting!</p>
+        <p className="text-sm text-gray-600 text-center mt-4">Thanks for voting!</p>
       )}
     </div>
-
   );
 }
