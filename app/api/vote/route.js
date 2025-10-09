@@ -4,9 +4,9 @@ export async function POST(request) {
   try {
     const { slug, optionId } = await request.json();
 
-    // 1. Get the blog by slug
-    const getBlog = await fetch(
-      `${process.env.STRAPI_API_URL}/api/blogs?filters[slug][$eq]=${slug}`,
+    // Get blog by slug
+    const getBlogRes = await fetch(
+      `https://dominate-football-backend.onrender.com/api/blogs?filters[slug][$eq]=${slug}`,
       {
         headers: {
           'Authorization': `Bearer ${process.env.STRAPI_API_TOKEN}`
@@ -14,14 +14,20 @@ export async function POST(request) {
       }
     );
 
-    const blogData = await getBlog.json();
-    const blog = blogData.data[0];
+    if (!getBlogRes.ok) {
+      return NextResponse.json({ error: 'Failed to fetch blog' }, { status: 500 });
+    }
 
-    if (!blog) {
+    const blogData = await getBlogRes.json();
+
+    // Check if blog exists
+    if (!blogData || !blogData.data || blogData.data.length === 0) {
       return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
     }
 
-    // 2. Calculate new votes
+    const blog = blogData.data[0];
+
+    // Calculate new votes
     const currentVotes = blog.pollVotes || { "0": 0, "1": 0, "2": 0 };
     const newVotes = {
       "0": parseInt(currentVotes["0"] || 0) + (optionId === 0 ? 1 : 0),
@@ -29,9 +35,9 @@ export async function POST(request) {
       "2": parseInt(currentVotes["2"] || 0) + (optionId === 2 ? 1 : 0),
     };
 
-    // 3. Update using numeric ID
+    // Update blog
     const updateRes = await fetch(
-      `${process.env.STRAPI_API_URL}/api/blogs/${blog.id}`,
+      `https://dominate-football-backend.onrender.com/api/blogs/${blog.id}`,
       {
         method: 'PUT',
         headers: {
@@ -47,12 +53,8 @@ export async function POST(request) {
     );
 
     if (!updateRes.ok) {
-      const error = await updateRes.text();
-      console.error('Update failed:', error);
-      return NextResponse.json({ error: 'Update failed' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to update vote' }, { status: 500 });
     }
-
-    const result = await updateRes.json();
 
     return NextResponse.json({
       success: true,
