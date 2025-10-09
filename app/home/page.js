@@ -3,10 +3,11 @@ import React from 'react';
 import Header from '../components/header';
 import Footer from '../components/footer';
 import BlogSliderClient from './BlogSliderClient.js';
-import NewsPreview from '../components/NewsPreview';
+import NewsPreview from '../components/NewsPreview'; // Import the new component
 
 async function fetchBlogs() {
-  const res = await fetch(`${process.env.STRAPI_API_URL}/api/blogs?populate=*&sort=publishedDate:desc&pagination[limit]=7`, {
+  // Modified: Limit to 7 blogs, sorted by latest first
+  const res = await fetch(`${process.env.STRAPI_API_URL}/blogs?populate=*&sort=publishedDate:desc&pagination[limit]=7`, {
     headers: {
       'Authorization': `Bearer ${process.env.STRAPI_API_TOKEN}`
     },
@@ -25,29 +26,23 @@ export default async function Home() {
   const blogs = await fetchBlogs();
 
   /* ───── configurable lists ───── */
-  const excludedBlogSlugs = ['gabriel-heinze-to-join-artetas-coaching-staff']; // Use slugs instead of IDs
-  const featuredBlogSlug = 'eze-joins-arsenal'; // ← CHANGE THIS to your featured blog's slug
+  const excludedBlogIds = [79, 80];  // don't show these in slider
+  const featuredBlogId  = 46;       // must remain first
   /* ────────────────────────────── */
 
-  // 1. Apply exclusions using slug (more stable than ID)
-  const filteredBlogs = blogs.filter(
-    blog => !excludedBlogSlugs.includes(blog.attributes.slug)
-  );
+  // 1. apply exclusions (already sorted by date from API)
+  const filteredBlogs = blogs
+    .filter(blog => !excludedBlogIds.includes(blog.id));
 
-  // 2. Pull featured blog out by slug and unshift to index 0
-  const idx = filteredBlogs.findIndex(
-    b => b.attributes.slug === featuredBlogSlug
-  );
-  
+  // 2. pull featured blog out of its position and unshift to index 0
+  const idx = filteredBlogs.findIndex(b => b.id === featuredBlogId);
   if (idx > -1) {
     const [featured] = filteredBlogs.splice(idx, 1);
     filteredBlogs.unshift(featured);
-  } else {
-    console.warn(`Featured blog with slug "${featuredBlogSlug}" not found!`);
   }
 
-  // 3. Filter news blogs for the preview section
-  const newsRes = await fetch(`${process.env.STRAPI_API_URL}/api/blogs?populate=*&filters[category][$eq]=news&sort=publishedDate:desc`, {
+  // 3. Filter news blogs for the preview section (separate fetch for news)
+  const newsRes = await fetch(`${process.env.STRAPI_API_URL}/blogs?populate=*&filters[category][$eq]=news&sort=publishedDate:desc`, {
     headers: {
       'Authorization': `Bearer ${process.env.STRAPI_API_TOKEN}`
     },
@@ -68,7 +63,7 @@ export default async function Home() {
           <BlogSliderClient blogs={filteredBlogs} />  
         )}
 
-        {/* Latest News Preview Section */}
+        {/* NEW: Latest News Preview Section */}
         <NewsPreview newsBlogs={newsBlogs} />
       </main>
       <Footer />
